@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.slsale.dao.userplace.UserPlaceMapper">
+    <!-- getUserPlaceList -->
+     <select id="getUserPlaceList" resultType="place" parameterType="place">
+		SELECT * FROM user_place place
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="placeId != null">
+				 	AND place.placeId = #{placeId}
+			</if>
+			<if test="userId != null">
+				 	AND place.userId = #{userId}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND place.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+		 ORder by place.placeTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="place">
+		SELECT count(*) FROM user_place 
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="placeId != null">
+				 	AND place.placeId = #{placeId}
+			</if>
+			<if test="userId != null">
+				 	AND place.userId = #{userId}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND place.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+	</select>
+	
+	<!-- getUserPlaceById -->
+	<select id="getUserPlaceById" resultType="place" parameterType="place">
+		SELECT * FROM user_place WHERE placeId = #{placeId}
+    </select>
+	
+	<!-- getUserPlaceByUserId -->
+	<select id="getUserPlaceByUserId" resultType="place" parameterType="int">
+		SELECT * FROM user_place WHERE userId = #{userId}
+    </select>
+    
+    <!-- addUserPlace -->
+	<insert id="addUserPlace" parameterType="place">
+		insert into user_place 
+			(
+			userId,bonusUserId,buyPV,bonusRate,bonusPV,placeTime
+			) 
+			values (
+				#{userId},#{bonusUserId},#{buyPV},#{bonusRate},#{bonusPV},#{placeTime}
+			)
+	</insert>
+    
+    <!-- deleteUserPlace -->
+	<delete id="deleteUserPlace" parameterType="place">
+		delete FROM user_place WHERE placeId = #{placeId}
+	</delete>
+    
+    <!-- modifyUserPlace -->
+	<update id="modifyUserPlace" parameterType="place">
+		update user_place 
+			<set>
+				 <if test="userId != 0.0"> userId = #{userId},</if>
+				 <if test="bonusUserId != 0.0"> bonusUserId = #{bonusUserId},</if>
+				 <if test="buyPV != 0.0"> buyPV = #{buyPV},</if>
+				 <if test="bonusRate != 0.0"> bonusRate = #{bonusRate}</if>
+				 <if test="bonusPV != null"> bonusPV = #{bonusPV},</if>
+				 <if test="placeTime != null"> placeTime = #{placeTime}</if>
+		     </set>
+		  	WHERE placeId = #{placeId}
+	</update>
+</mapper>  

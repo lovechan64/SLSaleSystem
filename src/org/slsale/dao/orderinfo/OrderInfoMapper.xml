@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.orderinfo.OrderInfoMapper">
+	 <resultMap type="order" id="orderListResult"> 
+	 	<result column="orderNum" property="orderNum"/> 
+        <collection property="olList" column="orderNum" javaType="ArrayList" ofType="orderList" select="selectOrderList"></collection>
+    </resultMap> 
+    <!-- selectOrderList关联子查询 -->
+    <select id="selectOrderList" resultType="orderList" parameterType="string">
+		SELECT * FROM order_list WHERE orderNum= #{orderNum}
+	</select>
+    <!-- getOrderInfoList -->
+	<select id="getOrderInfoList" resultMap="orderListResult" parameterType="order">
+		select oi.*,aup.userName as pickUserName,aub.userName as buyUserName from order_info oi,au_user aup,au_user aub
+		<trim prefix="where" prefixOverrides="and | or">
+			 aup.id = oi.pickUserId 
+			 AND aub.id = oi.buyUserId 
+			<if test="orderNum != null">
+			 and oi.orderNum = #{orderNum}
+			</if>
+			<if test="type != null">
+			  and oi.type = #{type}
+			</if>
+			<if test="pickUserId != null">
+			 and oi.pickUserId = #{pickUserId}
+			</if>
+			<if test="buyUserId != null">
+			 and oi.buyUserId = #{buyUserId}
+			</if>
+			<if test="stat != null">
+			  and oi.stat = #{stat}
+			</if>
+			<if test="shipNum != null">
+			  and oi.shipNum = #{shipNum}
+			</if>
+			<if test="searchStr != null">
+			  and aub.userName like #{searchStr}
+			</if>
+			<if test="searchStr1 != null">
+			  and oi.stat in (${searchStr1})
+			</if>
+		</trim>
+		order by oi.orderTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+    <!-- getOrderInfoBySearch -->
+	<select id="getOrderInfoBySearch" resultType="order" parameterType="order">
+		select * from order_info oi
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="type != null">
+			  and oi.type = #{type}
+			</if>
+			<if test="orderNum != null">
+			 and oi.orderNum = #{orderNum}
+			</if>
+			<if test="pickUserId != null">
+			 and oi.pickUserId = #{pickUserId}
+			</if>
+			<if test="buyUserId != null">
+			 and oi.buyUserId = #{buyUserId}
+			</if>
+			<if test="stat != null">
+			  and oi.stat = #{stat}
+			</if>
+		</trim>
+	</select>
+	
+	<select id="count" resultType="int" parameterType="order">
+		select count(1) from order_info oi,au_user aup,au_user aub
+		<trim prefix="where" prefixOverrides="and | or">
+			 aup.id = oi.pickUserId 
+			 AND aub.id = oi.buyUserId 
+			<if test="orderNum != null">
+			 and oi.orderNum = #{orderNum}
+			</if>
+			<if test="type != null">
+			  and oi.type = #{type}
+			</if>
+			<if test="pickUserId != null">
+			 and oi.pickUserId = #{pickUserId}
+			</if>
+			<if test="buyUserId != null">
+			 and oi.buyUserId = #{buyUserId}
+			</if>
+			<if test="stat != null">
+			  and oi.stat = #{stat}
+			</if>
+			<if test="shipNum != null">
+			  and oi.shipNum = #{shipNum}
+			</if>
+			<if test="searchStr != null">
+			  and aub.userName like #{searchStr}
+			</if>
+			<if test="searchStr1 != null">
+			  and oi.stat in (${searchStr1})
+			</if>
+		</trim>
+	</select>
+	
+	<!-- addOrderInfo -->
+	<insert id="addOrderInfo" parameterType="order">
+		insert into order_info 
+		(
+			orderTime,orderNum,type,pickUserId,buyUserId,
+			repeatPV,basePV,serviceFee,shipFre,tax,country,tel,
+			mobile,email,userAddress,postCode,stat,shipType,
+			shipNum,shipTime,receiveTime,shipNote
+		) values (
+			#{orderTime},#{orderNum},#{type},#{pickUserId},#{buyUserId},#{repeatPV},
+			 #{basePV},#{serviceFee},#{shipFre},#{tax},#{country},#{tel}
+			 ,#{mobile},#{email},#{userAddress},#{postCode},#{stat},#{shipType},
+			 #{shipNum},#{shipTime},#{receiveTime},#{shipNote}
+		 )
+	</insert>
+	
+	<!-- getUserById -->
+	<select id="getOrderInfoById" resultMap="orderListResult" parameterType="order">
+		select * from order_info where orderId = #{orderId}
+    </select>
+    
+     <!-- modifyOrderInfo -->
+	<update id="modifyOrderInfo" parameterType="order">
+		update order_info 
+			<set>
+				 <if test="orderTime != null"> orderTime = #{orderTime},</if>
+				 <if test="orderNum != null"> orderNum = #{orderNum},</if>
+				 <if test="type != null"> type = #{type},</if>
+				 <if test="pickUserId != null"> pickUserId = #{pickUserId},</if>
+				 <if test="buyUserId != null"> buyUserId = #{buyUserId},</if>
+				 <if test="repeatPV != null"> repeatPV = #{repeatPV},</if>
+				 <if test="basePV != null"> basePV = #{basePV},</if>
+				 <if test="serviceFee != null"> serviceFee = #{serviceFee},</if>
+				 <if test="shipFre != null"> shipFre = #{shipFre},</if>
+				 <if test="tax != null"> tax = #{tax},</if>
+				 <if test="country != null"> country = #{country},</if>
+				 <if test="tel != null"> tel = #{tel},</if>
+				 <if test="mobile != null"> mobile = #{mobile},</if>
+				 <if test="email != null"> email = #{email},</if>
+				 <if test="userAddress != null"> userAddress = #{userAddress},</if>
+				 <if test="postCode != null"> postCode = #{postCode},</if>
+				 <if test="stat != null"> stat = #{stat},</if>
+				 <if test="shipType != null"> shipType = #{shipType},</if>
+				 <if test="shipNum != null"> shipNum = #{shipNum},</if>
+				 <if test="shipTime != null"> shipTime = #{shipTime},</if>
+				 <if test="receiveTime != null"> receiveTime = #{receiveTime},</if>
+				 <if test="shipNote != null"> shipNote = #{shipNote}</if>
+		     </set>
+		  	where orderId = #{orderId}
+	</update>
+	
+     <!-- submitOrderInfoAll -->
+	<update id="submitOrderInfoAll" parameterType="order">
+		update order_info 
+			<set>
+				 <if test="stat != null"> stat = #{stat}</if>
+		     </set>
+		  	WHERE stat = #{searchStr} AND DATE_FORMAT(orderTime,'%Y-%m-%d') = #{orderTime}
+	</update>
+	
+	 <!-- deleteOrderInfo -->
+	<delete id="deleteOrderInfo" parameterType="order">
+		delete from order_info where orderId = #{orderId}
+	</delete>
+	
+    <!-- getUserList -->
+     <select id="getUserList" resultType="user" parameterType="user">
+		select * from au_user  
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="userName != null">
+			 and userName like  #{userName}
+			</if>
+			<if test="loginCode != null">
+			 and loginCode = #{loginCode}
+			</if>
+			<if test="roleId != null">
+			  and roleId = #{roleId}
+			</if>
+			<if test="isStart != null">
+			  and isStart = #{isStart}
+			</if>
+			<if test="referCode != null">
+			  and referCode like #{referCode}
+			</if>
+			<if test="referId != null">
+			  and referId = #{referId}
+			</if>
+			<if test="userType != null">
+			  and userType = #{userType}
+			</if>
+			<if test="totalCode != null">
+			  and totalCode like #{totalCode}
+			</if>
+			<if test="activeStatus != null">
+			  and activeStatus ${activeStatus}
+			</if>
+		 </trim>
+	</select>
+	
+    <!-- calBonus -->
+     <select id="calBonus" resultType="Double" parameterType="order">
+		SELECT SUM(oi.repeatPV) FROM order_info oi
+		<trim prefix="where" prefixOverrides="and | or">
+		<if test="type != null">
+			oi.type=#{type} 
+		</if>
+		<if test="searchStr != null">
+			DATE_FORMAT(oi.orderTime,'%Y-%m')= #{searchStr}
+		</if>
+		<if test="totalCode != null and depth != null">
+			AND oi.buyUserId IN (select id FROM Au_User WHERE totalCode LIKE #{totalCode}
+			<![CDATA[
+				AND depth <= #{depth} AND activeStatus = 1
+			]]>
+			)
+		</if>
+		</trim>		
+	</select>
+	
+	<!-- getLastInsertId -->
+    <select id="getLastInsertId" resultType="int">
+		select LAST_INSERT_ID()
+	</select>
+</mapper>  

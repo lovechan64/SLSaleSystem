@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.useraccountlog.UserAccountLogMapper">
+    <!-- getUserAccountLogList -->
+     <select id="getUserAccountLogList" resultType="userAccountLog" parameterType="userAccountLog">
+			SELECT * FROM user_account_log_${searchStr}  
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND actionTime >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="searchStr1 != null">
+					 	AND actionType IN  ( ${searchStr1} )
+				</if>
+				<if test="userId != 0">
+				 		AND userId = #{userId}
+				</if>
+			 </trim>
+			 ORder by actionTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="userAccountLog">
+			SELECT count(1) FROM user_account_log_${searchStr} 
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND actionTime >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="endTimeStr != null">
+				 	<![CDATA[
+				 		AND actionTime <= #{endTimeStr}
+				 	]]>
+				</if>
+				<if test="userId != 0">
+				 		AND userId = #{userId}
+				</if>
+				<if test="searchStr1 != null">
+					 	AND actionType IN  ( ${searchStr1} )
+				</if>
+			 </trim>
+	</select>
+	
+	<!-- getUserAccountLogById -->
+	<select id="getUserAccountLogById" resultType="userAccountLog" parameterType="userAccountLog">
+		SELECT * FROM user_account_log_${searchStr} WHERE accountLogId = #{accountLogId}
+    </select>
+    
+	<!-- getUserAccountLogByUserId -->
+	<select id="getUserAccountLogByUserId" resultType="userAccountLog" parameterType="userAccountLog">
+		SELECT * FROM user_account_log_${searchStr} WHERE userId = #{userId}
+    </select>
+    
+    <!-- addUserAccountLog -->
+	<insert id="addUserAccountLog" parameterType="userAccountLog">
+		insert into user_account_log_${searchStr} 
+			(
+				userId,actionTime,actionDesc,actionType,baseIn,baseOut,
+				baseBalance,repeatIn,repeatOut,repeatBalance
+			) 
+			values 
+			(
+				#{userId},#{actionTime},#{actionDesc},#{actionType},#{baseIn},#{baseOut},
+				#{baseBalance},#{repeatIn},#{repeatOut},#{repeatBalance}
+			)
+	</insert>
+	
+    <!-- addUserAccountLog -->
+	<insert id="addUserAccountLogByBatch" parameterType="userAccountLog">
+		insert into user_account_log_${searchStr} 
+			(
+				userId,actionTime,actionDesc,actionType,baseIn,baseOut,
+				baseBalance,repeatIn,repeatOut,repeatBalance
+			) 
+			values 
+			<foreach collection="list" item="item" index="index" separator="," >  
+			(
+				#{item.userId},#{item.actionTime},#{item.actionDesc},#{item.actionType},#{item.baseIn},#{item.baseOut},
+				#{item.baseBalance},#{item.repeatIn},#{item.repeatOut},#{item.repeatBalance}
+			)
+		    </foreach>  
+	</insert>
+    
+    <!-- deleteUserAccountLog -->
+	<delete id="deleteUserAccountLog" parameterType="userAccountLog">
+		delete FROM user_account_log_${searchStr} WHERE accountLogId = #{accountLogId}
+	</delete>
+    
+    <!-- modifyUserAccountLog -->
+	<update id="modifyUserAccountLog" parameterType="userAccountLog">
+		update user_account_log_${searchStr} 
+			<set>
+				 <if test="userId != null"> userId = #{userId},</if>
+				 <if test="actionTime != null"> actionTime = #{actionTime},</if>
+				 <if test="actionDesc != null"> actionDesc = #{actionDesc},</if>
+				 <if test="actionType != null"> actionType = #{actionType},</if>
+				 <if test="baseIn != null"> baseIn = #{baseIn},</if>
+				 <if test="baseOut != null"> baseOut = #{baseOut},</if>
+				 <if test="baseBalance != null"> baseBalance = #{baseBalance},</if>
+				 <if test="repeatIn != null"> repeatIn = #{repeatIn},</if>
+				 <if test="repeatOut != null"> repeatOut = #{repeatOut},</if>
+				 <if test="repeatBalance != null"> repeatBalance = #{repeatBalance}</if>
+		     </set>
+		  	WHERE accountLogId = #{accountLogId}
+	</update>
+	
+    <!-- createCurrentAccountTable -->
+	<select id="createCurrentAccountLogTable" parameterType="userAccountLog">
+		CREATE TABLE If Not Exists USER_ACCOUNT_LOG_${searchStr} (
+		  `accountLogId` bigint(20) NOT NULL auto_increment,
+		  `userId` bigint(20) DEFAULT NULL,
+		  `actionTime` timestamp,
+		  `actionDesc` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '动作摘要',
+		  `actionType` decimal(6,0) DEFAULT NULL COMMENT '0辅消,1重消',
+		  `baseIn` decimal(12,4) DEFAULT NULL COMMENT '基本入账',
+		  `baseOut` decimal(12,4) DEFAULT NULL COMMENT '基本出账',
+		  `baseBalance` decimal(12,4) DEFAULT NULL COMMENT '基本余额',
+		  `repeatIn` decimal(12,4) DEFAULT NULL COMMENT '重消入账',
+		  `repeatOut` decimal(12,4) DEFAULT NULL COMMENT '重消出账',
+		  `repeatBalance` decimal(12,4) DEFAULT NULL COMMENT '重消余额',
+		  PRIMARY KEY (`accountLogId`)
+		) 
+	</select>
+	
+</mapper>  

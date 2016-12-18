@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.useraccount.UserAccountMapper">
+    <!-- getUserAccountList -->
+     <select id="getUserAccountList" resultType="userAccount" parameterType="userAccount">
+			SELECT * FROM user_account_${searchStr}  
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND accountData >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="userId != 0">
+					 	AND userId = #{userId}
+				</if>
+			 </trim>
+			 ORder by actionTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="userAccount">
+			SELECT count(*) FROM user_account_${searchStr} 
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND accountData >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="userId!=0">
+					 	AND userId = #{userId}
+				</if>
+			 </trim>
+	</select>
+	
+	<!-- getUserAccountById -->
+	<select id="getUserAccountById" resultType="userAccount" parameterType="userAccount">
+		SELECT * FROM user_account_${searchStr} WHERE accountId = #{accountId}
+    </select>
+    
+	<!-- getUserAccountByUserId -->
+	<select id="getUserAccountByUserId" resultType="userAccount" parameterType="userAccount">
+		SELECT * FROM user_account_${searchStr} WHERE userId = #{userId}
+    </select>
+    
+    <!-- addUserAccount -->
+	<insert id="addUserAccount" parameterType="userAccount">
+		insert into user_account_${searchStr} 
+			(
+				userId,accountData,stat,baseIn,baseOut,
+				baseBalance,repeatIn,repeatOut,repeatBalance,
+				freePV,alreadyPV,buyPV
+			) 
+			values (
+				#{userId},#{accountData},#{stat},#{baseIn},#{baseOut},
+				#{baseBalance},#{repeatIn},#{repeatOut},#{repeatBalance},
+				#{freePV},#{alreadyPV},#{buyPV}
+			)
+	</insert>
+	
+    <!-- addUserAccountByBatch -->
+	<insert id="addUserAccountByBatch" parameterType="userAccount">
+		insert into user_account_${searchStr} 
+			(
+				userId,accountData,stat,baseIn,baseOut,
+				baseBalance,repeatIn,repeatOut,repeatBalance,
+				freePV,alreadyPV,buyPV
+			) 
+			values
+			<foreach collection="list" item="item" index="index" separator="," > 
+			 (
+				#{userId},#{accountData},#{stat},#{baseIn},#{baseOut},
+				#{baseBalance},#{repeatIn},#{repeatOut},#{repeatBalance},
+				#{freePV},#{alreadyPV},#{buyPV}
+			)
+			</foreach>
+	</insert>
+    
+    <!-- deleteUserAccount -->
+	<delete id="deleteUserAccount" parameterType="userAccount">
+		delete FROM user_account_${searchStr} WHERE accountId = #{accountId}
+	</delete>
+    
+    <!-- modifyUserAccount -->
+	<update id="modifyUserAccount" parameterType="userAccount">
+		update user_account_${searchStr} 
+			<set>
+				 <if test="accountData != null"> accountData = #{accountData},</if>
+				 <if test="stat != 0"> stat = #{stat},</if>
+				 <if test="baseIn != 0.0"> baseIn = #{baseIn},</if>
+				 <if test="baseOut != 0.0"> baseOut = #{baseOut},</if>
+				 <if test="baseBalance != 0.0"> baseBalance = #{baseBalance},</if>
+				 <if test="repeatIn != 0.0"> repeatIn = #{repeatIn},</if>
+				 <if test="repeatOut != 0.0"> repeatOut = #{repeatOut},</if>
+				 <if test="repeatBalance != 0.0"> repeatBalance = #{repeatBalance},</if>
+				 <if test="freePV != 0"> freePV = #{freePV},</if>
+				 <if test="alreadyPV != 0"> alreadyPV = #{alreadyPV},</if>
+				 <if test="buyPV != 0"> buyPV = #{buyPV}</if>
+		     </set>
+		  	WHERE accountId = #{accountId} and userId = #{userId}
+	</update>
+	
+    <!-- modifyUserAccount -->
+	<update id="modifyUserAccountByBatch" parameterType="java.util.ArrayList">
+		update user_account_${searchStr} 
+		<foreach collection="list" item="account" index="index" separator="," >  
+			set accountData = now(),
+			stat = #{account.stat},
+			baseIn = #{account.baseIn},
+			baseBalance = #{account.baseBalance},
+			actionType = #{account.actionType},
+			actionDesc = #{account.actionDesc}
+		  	WHERE accountId = #{account.accountId} and userId = #{account.userId}
+	    </foreach> 
+	</update>
+	
+    <!-- createCurrentAccountTable -->
+	<select id="createCurrentAccountTable" parameterType="userAccount">
+		CREATE TABLE If Not Exists USER_ACCOUNT_${searchStr} ( 
+			`accountId` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID', 
+			`userId` INT(11) NOT NULL COMMENT '用户主键ID',  
+			`accountData` timestamp COMMENT '日期',  
+			`stat` INT(11) DEFAULT NULL COMMENT '总账状态',  
+			`baseIn` DOUBLE(12,4) DEFAULT NULL COMMENT '基本入账',  
+			`baseOut` DOUBLE(12,4) DEFAULT NULL COMMENT '基本出账',  
+			`baseBalance` DOUBLE(12,4) DEFAULT NULL COMMENT '基本余额',  
+			`repeatIn` DOUBLE(12,4) DEFAULT NULL COMMENT '重消入账',  
+			`repeatOut` DOUBLE(12,4) DEFAULT NULL COMMENT '重消出账',  
+			`repeatBalance` DOUBLE(12,4) DEFAULT NULL COMMENT '重消余额',  
+			`freePV` DOUBLE(12,4) DEFAULT NULL COMMENT '未分红重消PV',  
+			`alreadyPV` DOUBLE(12,4) DEFAULT NULL COMMENT '已分红未领货重消PV',  
+			`buyPV` DOUBLE(12,4) DEFAULT NULL COMMENT '已领货重消PV',  
+			PRIMARY KEY (`accountId`)
+		)
+	</select>
+	
+    <!-- insertAccountTableData -->
+	<insert id="insertAccountTableData" parameterType="userAccount">
+		INSERT INTO USER_ACCOUNT_${searchStr}
+		(userId,accountData,stat,baseIn,baseOut,baseBalance,repeatIn,repeatOut,repeatBalance,freePV,alreadyPV,buyPV)
+		SELECT ua.userId,ua.accountData,ua.stat,ua.baseIn,ua.baseOut,ua.baseBalance,ua.repeatIn,
+		ua.repeatOut,ua.repeatBalance,ua.freePV,ua.alreadyPV,ua.buyPV
+		FROM USER_ACCOUNT_${searchStr1} ua,AU_USER au
+		WHERE au.id=ua.userId AND au.isStart =1
+	</insert>
+    
+</mapper>  

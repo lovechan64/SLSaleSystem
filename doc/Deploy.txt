@@ -1,0 +1,42 @@
+2014-3-9
+1.系统lib添加jstl.1.2.jar包，以支持EL表达式的使用。
+2.开发公告管理
+	2.1 创建POJO Affiche.java
+	2.2 创建AfficheMapper.java and AfficeMapper.xml
+	2.3 在mybatis-config.xml中添加POJO配置。affiche
+	2.4 create AfficheService and impl java files.
+	2.5 create AfficheController.java file.
+	2.6 create affiche.jsp,affiche.js,affiche.css files.	
+	2.7 head.jsp中添加affiche.css的路径 <link href='/statics/localcss/affiche.css' rel='stylesheet'>
+2014-4-22
+开发充值汇款功能
+User_Recharge表增加一个充值状态字段——rechargeType
+2014-4-25
+数据字典表的valueId更改varchar类型 
+后续需修改数据字典的添加和修改功能，使valueId可手动添加或修改
+2014-5-4
+购物管理中没有产品图片展示，需在需求文档中给出说明，此系统为内部系统，默认所有对产品非常熟悉，不需要产品图片展示
+2014-5-6
+au_user表中增加了快递类型字段（expressType）
+2014-5-7
+inventory表中增加了类型字段（type）
+2014-5-8
+user_refer表
+增加 userId
+REFER_LOG_ID 改为 id
+referId 改为 referUserId
+2014-5-12
+order_info表
+1、删除listId字段
+2、增加goodsType字段
+2014-5-13
+1、事务问题有待解决
+2、user表增加字段：	
+    private Date activeStatus;//激活状态
+    private Date activeTime;  //激活时间
+2014-5-14
+UserPlace表中必须插入一个唯一的系统管理员totalCode（单个字符）作为系统初始化数据
+2014-5-17
+order_info表增加type字段 表示订单类型 可选值：BD、CX、FX
+
+    

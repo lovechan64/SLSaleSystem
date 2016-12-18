@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.slsale.dao.userbuybonus.UserBuyBonusMapper">
+    <!-- getUserBuyBonusList -->
+     <select id="getUserBuyBonusList" resultType="bonus" parameterType="bonus">
+		SELECT * FROM user_buy_bonus bonus
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="bonusMonth != null">
+				 	AND bonus.bonusMonth = #{bonusMonth}
+			</if>
+			<if test="calTime != null">
+				 	AND DATE_FORMAT(bonus.calTime,'%Y-%m-%d') = #{calTime}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND bonus.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+		 ORder by bonus.calTime desc limit #{starNum},#{pageSize}
+	</select>
+
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="bonus">
+		SELECT count(*) FROM user_buy_bonus 
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="bonusMonth != null">
+				 	AND bonus.bonusMonth = #{bonusMonth}
+			</if>
+			<if test="calTime != null">
+				 	AND DATE_FORMAT(bonus.calTime,'%Y-%m-%d') = #{calTime}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND bonus.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+	</select>
+	
+	<!-- getUserBuyBonusById -->
+	<select id="getUserBuyBonusById" resultType="bonus" parameterType="bonus">
+		SELECT * FROM user_buy_bonus WHERE id = #{id}
+    </select>
+	
+    <!-- addUserBuyBonus -->
+	<insert id="addUserBuyBonus" parameterType="bonus">
+		insert into user_buy_bonus 
+			(
+			bonusMonth,bonusUserId,calTime,bonusRate,buyPV,bonusPV
+			) 
+			values (
+				#{bonusMonth},#{bonusUserId},#{calTime},#{bonusRate},#{buyPV},#{bonusPV}
+			)
+	</insert>
+	
+    <!-- addUserBuyBonusByBatch -->
+	<insert id="addUserBuyBonusByBatch" parameterType="java.util.List">
+		insert into user_buy_bonus 
+			(
+			bonusMonth,bonusUserId,calTime,bonusRate,buyPV,bonusPV
+			) 
+			values 
+			<foreach collection="list" item="item" index="index" separator="," > 
+			(
+				#{item.bonusMonth},#{item.bonusUserId},#{item.calTime},#{item.bonusRate},#{item.buyPV},#{item.bonusPV}
+			)
+			</foreach>
+	</insert>
+    <!-- deleteUserBuyBonus -->
+	<delete id="deleteUserBuyBonus" parameterType="bonus">
+		delete FROM user_buy_bonus WHERE id = #{id}
+	</delete>
+    
+    <!-- modifyUserBuyBonus -->
+	<update id="modifyUserBuyBonus" parameterType="bonus">
+		update user_buy_bonus 
+			<set>
+				 <if test="bonusMonth != null"> bonusMonth = #{bonusMonth},</if>
+				 <if test="calTime != null"> calTime = #{calTime},</if>
+				 <if test="bonusUserId != null"> bonusUserId = #{bonusUserId},</if>
+				 <if test="buyPV != null"> buyPV = #{buyPV},</if>
+				 <if test="bonusRate != null"> bonusRate = #{bonusRate},</if>
+				 <if test="bonusPV != null"> bonusPV = #{bonusPV}</if>
+		     </set>
+		  	WHERE id = #{id}
+	</update>
+	
+	<!-- "getSumBonusPV" -->
+	<select id="getSumBonusPV" resultType="Double" parameterType="bonus">
+		select SUM(bonusPV) from user_buy_bonus 
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="calTime != null">
+			    <![CDATA[
+					AND DATE_FORMAT(calTime,'%Y-%m-%d') =  #{calTime}
+				]]>
+			</if>
+			<if test="bonusUserId != null">
+			  and bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+	</select>
+</mapper>  

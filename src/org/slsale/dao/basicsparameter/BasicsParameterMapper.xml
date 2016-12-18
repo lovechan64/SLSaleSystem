@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.basicsparameter.BasicsParameterMapper">
+	
+    <!-- getBasicsParameterList -->
+     <select id="getBasicsParameterList" resultType="param" parameterType="param">
+		select * from basics_parameter a
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="code != null">
+			  and a.code = #{code}
+			</if>
+			<if test="name != null">
+			  and a.name = #{name}
+			</if>
+			<if test="value != null">
+			  and a.value = #{value}
+			</if>
+			<if test="dr != null">
+			  and a.dr = #{dr}
+			</if>
+		 </trim>
+	</select>
+	
+	<!-- addBasicsParameter -->
+	<insert id="addBasicsParameter" parameterType="param" >
+		 insert into basics_parameter (code,name,value,descrption,dr) 
+		 values (#{code},#{name},#{value},#{descrption},#{dr})
+	</insert>
+    <!-- modifyBasicsParameter -->
+	<update id="modifyBasicsParameter" parameterType="param">
+		update basics_parameter 
+			<set>
+				 <if test="code != null"> code = #{code},</if>
+				 <if test="name != null"> name = #{name},</if>
+				 <if test="value != null"> value = #{value},</if>
+				 <if test="descrption != null"> descrption = #{descrption},</if>
+				 <if test="dr != null"> dr = #{dr}</if>
+		     </set>
+		  	WHERE id = #{id} and id = #{id}
+	</update>
+	
+	<!-- deleteBasicsParameter -->
+	<delete id ="deleteBasicsParameter" parameterType="param">
+		delete from basics_parameter where id = ?
+	</delete>
+	
+</mapper>  

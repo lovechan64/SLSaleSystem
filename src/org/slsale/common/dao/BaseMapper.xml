@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.common.dao.BaseMapper">
+    <!-- getUserAccountList -->
+     <select id="executeSQL" resultType="int" parameterType="base">
+		#{executeSQL}
+	</select>
+</mapper>  

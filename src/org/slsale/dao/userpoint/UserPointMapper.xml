@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.slsale.dao.userpoint.UserPointMapper">
+    <!-- getUserPointList -->
+     <select id="getUserPointList" resultType="point" parameterType="point">
+		SELECT * FROM user_bonus point
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="bonusMonth != null">
+				 	AND point.bonusMonth = #{bonusMonth}
+			</if>
+			<if test="calTime != null">
+				 	AND DATE_FORMAT(point.calTime,'%Y-%m-%d') = #{calTime}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND point.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+		 ORder by point.calTime desc limit #{starNum},#{pageSize}
+	</select>
+
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="point">
+		SELECT count(*) FROM user_bonus 
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="bonusMonth != null">
+				 	AND point.bonusMonth = #{bonusMonth}
+			</if>
+			<if test="calTime != null">
+				 	AND DATE_FORMAT(point.calTime,'%Y-%m-%d') = #{calTime}
+			</if>
+			<if test="bonusUserId != null">
+				 	AND point.bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+	</select>
+	
+	<!-- getUserPointById -->
+	<select id="getUserPointById" resultType="point" parameterType="point">
+		SELECT * FROM user_bonus WHERE id = #{id}
+    </select>
+	
+    <!-- addUserPoint -->
+	<insert id="addUserPoint" parameterType="point">
+		insert into user_bonus 
+			(
+			bonusMonth,bonusUserId,calTime,bounsRate,buyPV,bonusPV
+			) 
+			values (
+				#{bonusMonth},#{bonusUserId},#{calTime},#{bounsRate},#{buyPV},#{bonusPV}
+			)
+	</insert>
+    <!-- deleteUserPoint -->
+	<delete id="deleteUserPoint" parameterType="point">
+		delete FROM user_bonus WHERE id = #{id}
+	</delete>
+    
+    <!-- modifyUserPoint -->
+	<update id="modifyUserPoint" parameterType="point">
+		update user_bonus 
+			<set>
+				 <if test="bonusMonth != null"> bonusMonth = #{bonusMonth},</if>
+				 <if test="calTime != null"> calTime = #{calTime},</if>
+				 <if test="bonusUserId != null"> bonusUserId = #{bonusUserId},</if>
+				 <if test="buyPV != null"> buyPV = #{buyPV},</if>
+				 <if test="bonusRate != null"> bonusRate = #{bonusRate},</if>
+				 <if test="bonusPV != null"> bonusPV = #{bonusPV}</if>
+		     </set>
+		  	WHERE id = #{id}
+	</update>
+	
+	<!-- "getSumBonusPV" -->
+	<select id="getSumBonusPV" resultType="Double" parameterType="point">
+		select SUM(bonusPV) from user_point
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="buyTime != null">
+			    <![CDATA[
+					AND DATE_FORMAT(buyTime,'%Y-%m-%d') =  #{buyTime}
+				]]>
+			</if>
+			<if test="bonusUserId != null">
+			  and bonusUserId = #{bonusUserId}
+			</if>
+		 </trim>
+	</select>
+</mapper>  

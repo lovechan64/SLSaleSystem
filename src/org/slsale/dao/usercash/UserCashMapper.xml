@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.slsale.dao.usercash.UserCashMapper">
+	 <resultMap type="userCash" id="userCashResult"> 
+	 	<result column="userId" property="userId"/> 
+        <association property="user" javaType="user" column="userId" select="selectUser"/>  
+    </resultMap> 
+    <!-- getUserCashList -->
+     <select id="getUserCashList" resultMap="userCashResult" parameterType="userCash">
+			SELECT * FROM user_cash cash
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND cash.cashTime >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="endTimeStr != null">
+					<![CDATA[
+						AND cash.cashTime <=  #{endTimeStr}
+					]]>
+				</if>
+				<if test="userId != null">
+					 	AND cash.userId = #{userId}
+				</if>
+			 </trim>
+			 ORder by cash.cashTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+    <!-- selectUser关联子查询 -->
+     <select id="selectUser" resultType="user" parameterType="int">
+			SELECT * FROM au_user WHERE id= #{id}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="userCash">
+			SELECT count(*) FROM user_cash 
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="startTimeStr != null">
+					<![CDATA[
+						AND cashTime >=  #{startTimeStr}
+					]]>
+				</if>
+				<if test="endTimeStr != null">
+					<![CDATA[
+						AND cashTime <=  #{endTimeStr}
+					]]>
+				</if>
+				<if test="userId != null">
+					 	AND userId = #{userId}
+				</if>
+			 </trim>
+	</select>
+	
+	<!-- getUserCashById -->
+	<select id="getUserCashById" resultType="userCash" parameterType="userCash">
+		SELECT * FROM user_cash WHERE id = #{id}
+    </select>
+    
+    <!-- addUserCash -->
+	<insert id="addUserCash" parameterType="userCash">
+		insert into user_cash 
+			(
+				cashTime,cashNum,userId,cashPV,currency,
+				pvRate,cashMoney,note,fee,tax,otherFee,bankName,
+				bankBrance,bankAccount,accountName,stat
+			) 
+			values (
+				#{cashTime},#{cashNum},#{userId},#{cashPV},#{currency},
+				#{pvRate},#{cashMoney},#{note},#{fee},#{tax},#{otherFee},#{bankName},
+				#{bankBrance},#{bankAccount},#{accountName},#{stat}
+			)
+	</insert>
+    
+    <!-- deleteUserCash -->
+	<delete id="deleteUserCash" parameterType="userCash">
+		delete FROM user_cash WHERE id = #{id}
+	</delete>
+    
+    <!-- modifyUserCash -->
+	<update id="modifyUserCash" parameterType="userCash">
+		update user_cash 
+			<set>
+				 <if test="cashTime != null"> cashTime = #{cashTime},</if>
+				 <if test="cashNum != null"> cashNum = #{cashNum},</if>
+				 <if test="cashPV != 0.0"> cashPV = #{cashPV},</if>
+				 <if test="currency != null"> currency = #{currency},</if>
+				 <if test="pvRate != 0.0"> pvRate = #{pvRate},</if>
+				 <if test="cashMoney != 0.0"> cashMoney = #{cashMoney},</if>
+				 <if test="note != null"> note = #{note},</if>
+				 <if test="fee != 0.0"> fee = #{fee},</if>
+				 <if test="tax != 0.0"> tax = #{tax},</if>
+				 <if test="otherFee != 0.0"> otherFee = #{otherFee}</if>
+				 <if test="bankName != null"> bankName = #{bankName},</if>
+				 <if test="bankBrance != null"> bankBrance = #{bankBrance},</if>
+				 <if test="bankAccount != null"> bankAccount = #{bankAccount},</if>
+				 <if test="accountName != null"> accountName = #{accountName}</if>
+				 <if test="stat != null"> stat = #{stat}</if>
+		     </set>
+		  	WHERE id = #{id} and userId = #{userId}
+	</update>
+	
+</mapper>  

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.useraccountlog.UserAccountLogMapper">
+	
+    <!-- getUserAccountLogList -->
+     <SELECT id="getUserAccountLogList" resultType="userAccountLog" parameterType="userAccountLog">
+		SELECT * FROM user_account_log_#{searchStr}  
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="startTime != null">
+			 AND actionTime >=  #{startTime}
+			</if>
+			<if test="endTime != null">
+			 AND actionTime <= #{endTime}
+			</if>
+		 </trim>
+		 ORder by actionTime desc limit #{starNum},#{pageSize}
+	</SELECT>
+	
+	<!-- getUserAccountLogById -->
+	<SELECT id="getUserAccountLogById" resultType="userAccountLog" parameterType="userAccountLog">
+		SELECT * FROM user_account_log_#{searchStr} WHERE accountLogId = #{accountLogId}
+    </SELECT>
+    
+    <!-- addUserAccountLog -->
+	<insert id="addUserAccountLog" parameterType="userAccountLog">
+		insert into user_account_log_#{searchStr} 
+			(
+				userId,actionTime,actionDesc,actionType,baseIn,baseOut,
+				baseBalance,repeatIn,repeatOut,repeatBalance
+			) 
+			values (
+					#{userId},#{actionTime},#{actionDesc},#{actionType},#{baseIn},#{baseOut},
+					#{baseBalance},#{repeatIn},#{repeatOut},#{repeatBalance}
+			)
+	</insert>
+    
+    <!-- deleteUserAccountLog -->
+	<delete id="deleteUserAccountLog" parameterType="userAccountLog">
+		delete FROM user_account_log_#{searchStr} WHERE accountLogId = #{accountLogId}
+	</delete>
+    
+    <!-- modifyUserAccountLog -->
+	<update id="modifyUserAccountLog" parameterType="userAccountLog">
+		update user_account_log_#{searchStr} 
+			<set>
+				 <if test="userId != null"> userId = #{userId},</if>
+				 <if test="actionTime != null"> actionTime = #{actionTime},</if>
+				 <if test="actionDesc != null"> actionDesc = #{actionDesc},</if>
+				 <if test="actionType != null"> actionType = #{actionType},</if>
+				 <if test="baseIn != null"> baseIn = #{baseIn},</if>
+				 <if test="baseOut != null"> baseOut = #{baseOut},</if>
+				 <if test="baseBalance != null"> baseBalance = #{baseBalance},</if>
+				 <if test="repeatIn != null"> repeatIn = #{repeatIn},</if>
+				 <if test="repeatOut != null"> repeatOut = #{repeatOut},</if>
+				 <if test="repeatBalance != null"> repeatBalance = #{repeatBalance}</if>
+		     </set>
+		  	WHERE accountLogId = #{accountLogId}
+	</update>
+	
+</mapper>  

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.userpair.UserPairMapper">
+    <!-- getUserPairList -->
+     <select id="getUserPairList" resultType="userPair" parameterType="userPair">
+			SELECT * FROM user_pair_${searchStr}  
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="pairTime != null">
+					<![CDATA[
+						AND DATE_FORMAT(pairTime,'%Y-%m-%d') =   DATE_FORMAT(#{pairTime},'%Y-%m-%d')
+					]]>
+				</if>
+				<if test="bonusUserId != null">
+					 	AND bonusUserId = #{bonusUserId}
+				</if>
+				<if test="yesterday != null">
+					 	AND DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+				</if>
+			 </trim>
+			 ORder by pairTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="userPair">
+			SELECT count(*) FROM user_pair_${searchStr} 
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="pairTime != null">
+					<![CDATA[
+						AND DATE_FORMAT(pairTime,'%Y-%m-%d') =   DATE_FORMAT(#{pairTime},'%Y-%m-%d')
+					]]>
+				</if>
+				<if test="bonusUserId != null">
+					 	AND bonusUserId = #{bonusUserId}
+				</if>
+				<if test="yesterday != null">
+					 	AND DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+				</if>
+			 </trim>
+	</select>
+	
+	<!-- getUserPairById -->
+	<select id="getUserPairById" resultType="userPair" parameterType="userPair">
+		SELECT * FROM user_pair_${searchStr} WHERE id = #{id}
+    </select>
+    
+    <!-- addUserPair -->
+	<insert id="addUserPair" parameterType="userPair">
+		insert into user_pair_${searchStr} 
+			(
+				pairTime,bonusUserId,leftUserNum,rightUserNum,leftKeep,
+				rightKeep,eachPV,sumPairPV,bonusRate,bonusPV
+			) 
+			values (
+				#{pairTime},#{bonusUserId},#{leftUserNum},#{rightUserNum},#{leftKeep},
+				#{rightKeep},#{eachPV},#{sumPairPV},#{bonusRate},#{bonusPV}
+			)
+	</insert>
+    
+    <!-- deleteUserPair -->
+	<delete id="deleteUserPair" parameterType="userPair">
+		delete FROM user_pair_${searchStr} WHERE pairId = #{pairId}
+	</delete>
+    
+    <!-- modifyUserPair -->
+	<update id="modifyUserPair" parameterType="userPair">
+		update user_pair_${searchStr} 
+			<set>
+				 <if test="pairTime != null"> pairTime = #{pairTime},</if>
+				 <if test="bonusUserId != null"> bonusUserId = #{bonusUserId},</if>
+				 <if test="leftUserNum != null"> leftUserNum = #{leftUserNum},</if>
+				 <if test="rightUserNum != null"> rightUserNum = #{rightUserNum},</if>
+				 <if test="leftKeep != null"> leftKeep = #{leftKeep},</if>
+				 <if test="rightKeep != null"> rightKeep = #{rightKeep},</if>
+				 <if test="eachPV != null"> eachPV = #{eachPV},</if>
+				 <if test="sumPairPV != null"> sumPairPV = #{sumPairPV},</if>
+				 <if test="bonusRate != null"> bonusRate = #{bonusRate},</if>
+				 <if test="bonusPV != null"> bonusPV = #{bonusPV}</if>
+		     </set>
+		  	WHERE id = #{id} and bonusUserId = #{bonusUserId}
+	</update>
+    <!-- createCurrentPairTable -->
+	<select id="createCurrentPairTable" parameterType="userPair">
+		CREATE TABLE If Not Exists `user_pair_${searchStr}` (
+			`id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+			`pairTime` date DEFAULT NULL COMMENT '对碰时间',
+			`bonusUserId` bigint(20) DEFAULT NULL,
+			`leftUserNum` bigint(10) DEFAULT NULL COMMENT '左用户总数',
+			`rightUserNum` bigint(10) DEFAULT NULL COMMENT '左用户总数',
+			`leftKeep` bigint(10) DEFAULT NULL COMMENT '左保留总数',
+			`rightKeep` bigint(10) DEFAULT NULL COMMENT '左保留总数',
+			`eachPV` double(12,2) DEFAULT '100.00' COMMENT '每碰PV数',
+			`sumPairPV` double(12,2) DEFAULT NULL COMMENT '总碰PV数',
+			`bonusRate` double(6,4) DEFAULT NULL COMMENT '奖金比率',
+			`bonusPV` double(12,2) DEFAULT NULL COMMENT '对碰奖励PV',
+			`pvTimes` bigint(20) DEFAULT NULL COMMENT '对碰标准数',
+			`leftYesterday` bigint(20) DEFAULT NULL COMMENT '左区昨日剩余碰数',
+			`rightYesterday` bigint(20) DEFAULT NULL COMMENT '右区昨日剩余碰数',
+			PRIMARY KEY (`id`)
+		)
+	</select>
+	
+    <!-- getUserPairByseletct -->
+	<select id="getUserPairByseletct" resultType="userPair" parameterType="userPair">
+		SELECT now() as pairTime,#{bonusUserId} as bonusUserId,#{eachPV} as eachPV,#{bonusRate} as bonusRate,
+		COUNT(Case WHEN au.totalCode LIKE '${totalCode}0%' Then 1 END) as leftUserNum,
+		COUNT(Case WHEN au.totalCode LIKE '${totalCode}1%' Then 1 END) as rightUserNum
+		FROM au_user au WHERE au.activeStatus = 1 AND DATE_FORMAT(au.activeTime,'%Y-%m-%d') = #{activeTime}
+	</select>
+	
+	 <!-- addUserPairBySettlement -->
+	<insert id="addUserPairBySettlement" parameterType="userPair">
+    	insert into user_pair_${searchStr} 
+    	 (pairTime,bonusUserId,leftUserNum,rightUserNum,eachPV,bonusRate)  
+    	VALUES   
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{pairTime},#{bonusUserId},#{leftUserNum},#{rightUserNum},#{eachPV},#{bonusRate})  
+	    </foreach>
+	</insert>
+	
+	<!-- 大于100碰的-->
+	<!-- updatePairByLDR  left >= right-->
+	<update id="updatePairByDLDDR" parameterType="userPair">
+	 	UPDATE user_pair_${searchStr} 
+		SET leftKeep = (leftUserNum + leftYesterday - 100), rightKeep = 0,pvTimes = 100
+		WHERE id IN (SELECT * FROM (SELECT id FROM user_pair_${searchStr}  WHERE DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+		AND (leftUserNum + leftYesterday) >= 100 AND (rightUserNum + rightYesterday) >=100
+		AND (leftUserNum + leftYesterday) >= (rightUserNum + rightYesterday)) a)
+	</update>
+	<!-- updatePairByDLXR left < right-->
+	<update id="updatePairByDLXR" parameterType="userPair">
+	 	<![CDATA[
+	 	UPDATE user_pair_${searchStr} 
+		SET leftKeep = 0, rightKeep = (rightUserNum + rightYesterday - 100), pvTimes = 100
+		WHERE id IN (SELECT * FROM (SELECT id FROM user_pair_${searchStr}  WHERE DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+		AND (leftUserNum + leftYesterday) >= 100 AND (rightUserNum + rightYesterday) >=100
+		AND (leftUserNum + leftYesterday) < (rightUserNum + rightYesterday)) a)
+	 	]]>
+	</update>
+		
+	<!-- 小于100碰的-->
+	<!-- updatePairByXLDDR left >= right-->
+	<update id="updatePairByXLDDR" parameterType="userPair">
+	 	<![CDATA[
+	 	UPDATE user_pair_${searchStr} 
+		SET leftKeep = (leftUserNum + leftYesterday - rightUserNum + rightYesterday), rightKeep = 0,pvTimes = (rightUserNum + rightYesterday)
+		WHERE id IN (SELECT * FROM (SELECT id FROM user_pair_${searchStr}  WHERE DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+		AND ((leftUserNum + leftYesterday) < 100 OR (rightUserNum + rightYesterday) < 100)
+		AND (leftUserNum + leftYesterday) >= (rightUserNum + rightYesterday)) a)
+	 	]]>
+	</update>
+		
+	<!-- updatePairByXLXR left < right-->
+	<update id="updatePairByXLXR" parameterType="userPair">
+		<![CDATA[
+		UPDATE user_pair_${searchStr} 
+		SET leftKeep = 0, rightKeep = (rightUserNum + rightYesterday - leftUserNum + leftYesterday), pvTimes = (leftUserNum + leftYesterday)
+		WHERE id IN (SELECT * FROM (SELECT id FROM user_pair_${searchStr}  WHERE DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+		AND ((leftUserNum + leftYesterday) < 100 OR (rightUserNum + rightYesterday) < 100) 
+		AND (leftUserNum + leftYesterday) < (rightUserNum + rightYesterday)) a)
+		]]>
+	</update>
+	<!-- updatePairBySettlement 结算-->
+	<update id="updatePairBySettlement" parameterType="userPair">
+	 	UPDATE user_pair_${searchStr} 
+		SET sumPairPV = (pvTimes * eachPV), bonusPV = (pvTimes * eachPV * bonusRate)
+		WHERE DATE_FORMAT(pairTime,'%Y-%m-%d') = #{yesterday}
+	</update>
+		
+</mapper>  

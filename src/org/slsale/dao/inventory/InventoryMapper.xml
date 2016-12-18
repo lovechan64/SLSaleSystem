@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.inventory.InventoryMapper">
+	
+    <!-- getInventoryList -->
+     <select id="getInventoryList" resultType="inventory" parameterType="inventory">
+		select * from inventory a
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="type != null">
+			  and a.type = #{type}
+			</if>
+			<if test="goodsId != null">
+			  and a.goodsId = #{goodsId}
+			</if>
+			<if test="stat != null">
+			  and a.stat = #{stat}
+			</if>
+		 </trim>
+	</select>
+	
+	<!-- addInventory -->
+	<insert id="addInventory" parameterType="inventory" >
+		 insert into inventory (goodsId,type,num,stat) values (#{goodsId},#{type},#{num},#{stat})
+	</insert>
+	 
+    <!-- modifyInventory -->
+	<update id="modifyInventory" parameterType="inventory">
+		update inventory 
+			<set>
+				 <if test="goodsId != null"> goodsId = #{goodsId},</if>
+				 <if test="type != null"> type = #{type},</if>
+				 <if test="num != null and num != null "> num = (num ${operator} #{num}),</if>
+				 <if test="stat != null"> stat = #{stat}</if>
+		     </set>
+		  	WHERE goodsId = #{goodsId} and type = #{type}
+	</update>
+	
+	<!-- deleteInventory -->
+	<delete id ="deleteInventory" parameterType="inventory">
+		delete from inventory where id = ?
+	</delete>
+	
+</mapper>  

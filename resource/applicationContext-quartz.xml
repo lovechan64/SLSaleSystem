@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+    <beans xmlns="http://www.springframework.org/schema/beans"  
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+            xmlns:aop="http://www.springframework.org/schema/aop"  
+            xmlns:p="http://www.springframework.org/schema/p"  
+            xmlns:tx="http://www.springframework.org/schema/tx"  
+            xmlns:context="http://www.springframework.org/schema/context"  
+            xsi:schemaLocation="   
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd   
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd   
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">  
+           
+        <!-- job -->
+        <bean id="createCurrentTableJob" class="org.slsale.job.CreateCurrentTableJob"></bean>
+        <bean id="dayBonusJob" class="org.slsale.job.DayBonusJob">
+        	<constructor-arg>
+			<list>
+				<ref bean="bonusPair"/>
+			</list>
+			</constructor-arg>
+        </bean>
+        <bean id="monthBonusJob" class="org.slsale.job.MonthBonusJob">
+        	<constructor-arg>
+			<list>
+				<ref bean="bonusMoneyBuy"/>
+			</list>
+			</constructor-arg>
+        </bean>
+        <!-- jobTask -->
+        <bean id="createCurrentTableJobTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+            <property name="targetObject" ref="createCurrentTableJob" />
+            <property name="targetMethod" value="createTable" />
+        </bean>
+        <bean id="dayBonusJobTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+            <property name="targetObject" ref="dayBonusJob" />
+            <property name="targetMethod" value="startCalculate" />
+        </bean>
+        <bean id="monthBonusJobTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+            <property name="targetObject" ref="monthBonusJob" />
+            <property name="targetMethod" value="startCalculate" />
+        </bean>
+        
+        <!-- jobTrigger -->
+        <!--设置触发器-->
+        <bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+            <property name="jobDetail" ref="createCurrentTableJobTask"/>
+            <property name="cronExpression" value="0 0 0 01 * ?" />
+        </bean>
+        <bean id="doDayTime" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+            <property name="jobDetail" ref="dayBonusJobTask"/>
+            <property name="cronExpression" value="0 05 0 * * ?" />
+        </bean>
+        <bean id="doMonthTime" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+            <property name="jobDetail" ref="monthBonusJobTask"/>
+            <property name="cronExpression" value="0 10 0 01 * ?" />
+        </bean>
+        
+        <!-- quertzFactoryManager -->
+        <!--启动触发器-->
+        <bean id="startQuertz" lazy-init="default" autowire="no" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+            <property name="triggers">
+            	<list>
+            		<ref bean="doTime"/>
+            		<ref bean="doDayTime"/>
+            		<ref bean="doMonthTime"/>
+            	</list>
+            </property>
+        </bean>
+        
+    </beans>  

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.ORg//DTD Mapper 3.0//EN"    
+"http://mybatis.ORg/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.userrecharge.UserRechargeMapper">
+	
+    <!-- getUserRechargeList -->
+     <select id="getUserRechargeList" resultType="userRecharge" parameterType="userRecharge">
+			SELECT * FROM user_recharge  
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="userId != null">
+					AND userId =  #{userId}
+				</if>
+			 </trim>
+			 ORder by rechargeTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- getCount -->
+	<select id="count" resultType="int" parameterType="userRecharge">
+			SELECT count(*) FROM user_recharge 
+			<trim prefix="WHERE" prefixOverrides="AND | OR">
+				<if test="userId != null">
+					AND userId =  #{userId}
+				</if>
+			 </trim>
+	</select>
+	
+	<!-- getUserRechargeById -->
+	<select id="getUserRechargeById" resultType="userRecharge" parameterType="String">
+		SELECT * FROM user_recharge WHERE rechargeId = #{id}
+    </select>
+    
+    <!-- addUserRecharge -->
+	<insert id="addUserRecharge" parameterType="userRecharge">
+		insert into user_recharge 
+			(
+				rechargeTime,rechargeNum,userId,currency,rechargeMoney,
+				note,creditedMoney,creditedTime,auditUser,pvRate,
+				pv,bankName,bankAccount,platform,param
+			) 
+			values (
+				#{rechargeTime},#{rechargeNum},#{userId},#{currency},#{rechargeMoney},
+				#{note},#{creditedMoney},#{creditedTime},#{auditUser},#{pvRate},
+				#{pv},#{bankName},#{bankAccount},#{platform},#{param}
+			)
+	</insert>
+	
+	<!-- getAddRechargeId -->
+    <select id="getAddRechargeId" resultType="int">
+		select LAST_INSERT_ID()
+	</select>
+	
+    <!-- deleteUserRecharge -->
+	<delete id="deleteUserRecharge" parameterType="userRecharge">
+		delete FROM user_recharge WHERE rechargeId = #{rechargeId}
+	</delete>
+    
+    <!-- modifyUserRecharge -->
+	<update id="modifyUserRecharge" parameterType="userRecharge">
+		update user_recharge 
+			<set>
+				 <if test="rechargeTime != null"> rechargeTime = #{rechargeTime},</if>
+				 <if test="rechargeNum != null"> rechargeNum = #{rechargeNum},</if>
+				 <if test="userId != null"> userId = #{userId},</if>
+				 <if test="currency != null"> currency = #{currency},</if>
+				 <if test="rechargeMoney != null"> rechargeMoney = #{rechargeMoney},</if>
+				 <if test="note != null"> note = #{note},</if>
+				 <if test="creditedMoney != null"> creditedMoney = #{creditedMoney},</if>
+				 <if test="creditedTime != null"> creditedTime = #{creditedTime},</if>
+				 <if test="auditUser != null"> auditUser = #{auditUser},</if>
+				 <if test="pvRate != null"> pvRate = #{pvRate}</if>
+				 <if test="pv != null"> pv = #{pv}</if>
+				 <if test="bankName != null"> bankName = #{bankName}</if>
+				 <if test="bankAccount != null"> bankAccount = #{bankAccount}</if>
+				 <if test="platform != null"> platform = #{platform}</if>
+				 <if test="param != null"> param = #{param}</if>
+		     </set>
+		  	WHERE rechargeId = #{rechargeId}
+		  	
+	</update>
+	
+</mapper>  

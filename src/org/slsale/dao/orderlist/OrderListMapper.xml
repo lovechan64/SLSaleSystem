@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.slsale.dao.orderlist.OrderListMapper">
+	
+    <!-- getOrderlistList -->
+	<select id="getOrderlistList" resultType="orderList" parameterType="orderList">
+		select * from order_list
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="orderNum != null">
+			 and orderNum = #{orderNum}
+			</if>
+			<if test="goodsType != null">
+			 and goodsType = #{goodsType}
+			</if>
+			<if test="goodsId != null">
+			 and goodsId = #{goodsId}
+			</if>
+			<if test="goodsSN != null">
+			  and goodsSN = #{goodsSN}
+			</if>
+			<if test="goodsName != null">
+			  and goodsName = #{goodsName}
+			</if>
+			<if test="goodsNum != null">
+			  and goodsNum = #{goodsNum}
+			</if>
+			<if test="eachPrice != null">
+			  and eachPrice = #{eachPrice}
+			</if>
+			<if test="sumPrice != null">
+			  and sumPrice = #{sumPrice}
+			</if>
+			<if test="currency != null">
+			  and currency = #{currency}
+			</if>
+		</trim>
+		order by orderNum desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<select id="count" resultType="int" parameterType="orderList">
+		select count(1) from order_list
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="orderNum != null">
+			 and orderNum = #{orderNum}
+			</if>
+			<if test="goodsType != null">
+			 and goodsType = #{goodsType}
+			</if>
+			<if test="goodsId != null">
+			 and goodsId = #{goodsId}
+			</if>
+			<if test="goodsSN != null">
+			  and goodsSN = #{goodsSN}
+			</if>
+			<if test="goodsName != null">
+			  and goodsName = #{goodsName}
+			</if>
+			<if test="goodsNum != null">
+			  and goodsNum = #{goodsNum}
+			</if>
+			<if test="eachPrice != null">
+			  and eachPrice = #{eachPrice}
+			</if>
+			<if test="sumPrice != null">
+			  and sumPrice = #{sumPrice}
+			</if>
+			<if test="currency != null">
+			  and currency = #{currency}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- addOrderList -->
+	<insert id="addOrderList" parameterType="orderList">
+		insert into order_list 
+		(
+			orderNum,goodsType,goodsId,goodsSN,
+			goodsName,goodsFormat,goodsNum,eachPrice,sumPrice,discount,
+			realPrice,currency,realPV,pvRate
+		) values (
+			 #{orderNum},#{goodsType},#{goodsId},#{goodsSN},#{goodsName},#{goodsFormat},
+			 #{goodsNum},#{eachPrice},#{sumPrice},#{discount},#{realPrice},#{currency}
+			 ,#{realPV},#{pvRate}
+		 )
+	</insert>
+	
+	<!-- getUserById -->
+	<select id="getOrderListById" resultType="orderList" parameterType="orderList">
+		select * from order_list where listId = #{listId}
+    </select>
+    
+     <!-- modifyOrderList -->
+	<update id="modifyOrderList" parameterType="orderList">
+		update order_list 
+			<set>
+				 <if test="orderNum != null"> orderNum = #{orderNum},</if>
+				 <if test="goodsType != null"> goodsType = #{goodsType},</if>
+				 <if test="goodsId != null"> goodsId = #{goodsId},</if>
+				 <if test="goodsSN != null"> goodsSN = #{goodsSN},</if>
+				 <if test="goodsName != null"> goodsName = #{goodsName},</if>
+				 <if test="goodsFormat != null"> goodsFormat = #{goodsFormat},</if>
+				 <if test="goodsNum != null"> goodsNum = #{goodsNum},</if>
+				 <if test="eachPrice != null"> eachPrice = #{eachPrice},</if>
+				 <if test="sumPrice != null"> sumPrice = #{sumPrice},</if>
+				 <if test="discount != null"> discount = #{discount},</if>
+				 <if test="realPrice != null"> realPrice = #{realPrice},</if>
+				 <if test="currency != null"> currency = #{currency}</if>
+				 <if test="realPV != null"> realPV = #{realPV}</if>
+				 <if test="pvRate != null"> pvRate = #{pvRate}</if>
+		     </set>
+		  	where listId = #{listId}
+	</update>
+	
+	 <!-- deleteOrderList -->
+	<delete id="deleteOrderList" parameterType="orderList">
+		delete from order_list 
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="orderNum != null">
+			 orderNum = #{orderNum}
+			</if>
+			<if test="listId != null">
+			 and listId = #{listId}
+			</if>
+		</trim>
+	</delete>
+	
+</mapper>  
